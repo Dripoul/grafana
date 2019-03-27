@@ -39,6 +39,7 @@ import { LAST_USED_DATASOURCE_KEY, ensureQueries, DEFAULT_RANGE, DEFAULT_UI_STAT
 import { Emitter } from 'app/core/utils/emitter';
 import { ExploreToolbar } from './ExploreToolbar';
 import { scanStopAction } from './state/actionTypes';
+import { FadeIn } from 'app/core/components/Animations/FadeIn';
 
 interface ExploreProps {
   StartPage?: ComponentClass<ExploreStartPageProps>;
@@ -226,16 +227,17 @@ export class Explore extends React.PureComponent<ExploreProps> {
           <div className="explore-container">Please add a datasource that supports Explore (e.g., Prometheus).</div>
         ) : null}
 
+        <div className={`explore-container`}>
+          <FadeIn duration={datasourceError ? 150 : 5} in={datasourceError ? true : false}>
+            <Alert
+              message={`Error connecting to datasource: ${datasourceError}`}
+              button={{ text: 'Reconnect', onClick: this.onReconnect }}
+            />
+          </FadeIn>
+        </div>
+
         {datasourceInstance && (
           <div className="explore-container">
-            {datasourceError && (
-              <div className="explore-container-alert">
-                <Alert
-                  message={`Error connecting to datasource: ${datasourceError}`}
-                  button={{ text: 'Reconnect', onClick: this.onReconnect }}
-                />
-              </div>
-            )}
             <QueryRows exploreEvents={this.exploreEvents} exploreId={exploreId} queryKeys={queryKeys} />
             <AutoSizer onResize={this.onResize} disableHeight>
               {({ width }) => {
